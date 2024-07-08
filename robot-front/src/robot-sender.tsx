@@ -6,13 +6,9 @@ const RobotSender = () => {
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5118/robot-hub")
+      .withUrl("https://hubapprs.azurewebsites.net/robot-hub")
       .withAutomaticReconnect()
       .build();
-
-    newConnection.on("RecieveData", (dataType, data) =>
-      console.log(dataType, data)
-    );
 
     setConnection(newConnection);
   }, []);
