@@ -10,6 +10,10 @@ const RobotSender = () => {
       .withAutomaticReconnect()
       .build();
 
+    newConnection.on("RecieveData", (dataType, data) =>
+      console.log(dataType, data)
+    );
+
     setConnection(newConnection);
   }, []);
 

@@ -26,9 +26,9 @@ public sealed class RobotHub : Microsoft.AspNetCore.SignalR.Hub
         await Clients.All.SendAsync("ReceiveCommand", command);
     }
 
-    public async Task SendData(string rendimiento)
+    public async Task SendData(string dataType, object data)
     {
-        _logger.LogInformation($"{Context.ConnectionId} with message '{rendimiento}'");
-        await Clients.All.SendAsync("RecibirData", rendimiento);
+        _logger.LogInformation("{@ConnectionId} send data with type {@DataType} and data {@Data}", Context.ConnectionId, dataType, data);
+        await Clients.All.SendAsync("RecibirData", dataType, data);
     }
 }
