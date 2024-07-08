@@ -31,7 +31,7 @@ def send_robot_data():
             data["batteryLifePercentage"] = 100
 
         hub_connection.send("SendData", ["RobotData", data])
-        
+
         time.sleep(5) # Para el hilo para enviar cada 5 segundos la data.
 
 def main():
@@ -39,7 +39,9 @@ def main():
     hub_connection.on('ReceiveCommand', on_command_received) # Register a callback to be called when a message is received from the server
     hub_connection.start()
 
-    threading.Timer(5, function=send_robot_data).start()
+    hilo_data = threading.Timer(5, function=send_robot_data)
+    hilo_data.daemon = True
+    hilo_data.start()
 
     input("Press <ENTER> to exit...\n")
     hub_connection.stop()
