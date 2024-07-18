@@ -17,6 +17,9 @@ const images = {
   triste: require("./images/triste.png"),
 };
 
+// Importar el archivo .ppn
+const holaMaviKeywordPath = require("./hola-mavi/Hey-ULI_en_wasm_v3_0_0.ppn");//La frase es Hey ULI 
+
 const SpeechToTextComponent = () => {
   const [text, setText] = useState(""); // Estado para almacenar el texto reconocido
   const [status, setStatus] = useState("En espera"); // Estado para manejar el estado del reconocimiento de voz
@@ -59,11 +62,10 @@ const SpeechToTextComponent = () => {
     const initPorcupine = async () => {
       try {
         const accessKey = "YOUR_ACCESS_KEY"; // Reemplaza con tu Access Key de Picovoice
-        const keywordPath = "path/to/hola-mavi.ppn"; // Ruta al archivo .ppn
 
         const porcupineWorker = await PorcupineWorker.create(
           accessKey,
-          keywordPath,
+          holaMaviKeywordPath,
           (keywordIndex) => {
             if (keywordIndex === 0) {
               setWakeWordDetected(true);
@@ -111,7 +113,7 @@ const SpeechToTextComponent = () => {
       handleListen();
       setWakeWordDetected(false); // Reset the wake word detected state
     }
-  }, [wakeWordDetected]);
+  }, [wakeWordDetected, handleListen]); //handlelisten añadido (si no funcciona correctamente eliminar esto)
 
   const handleListen = useCallback(() => {
     if (!browserSupportsSpeechRecognition) {
