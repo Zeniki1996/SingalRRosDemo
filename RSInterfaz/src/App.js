@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-import { PorcupineWorker } from "@picovoice/porcupine-web";
+import { BuiltInKeyword, PorcupineWorker } from "@picovoice/porcupine-web";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { usePorcupine } from "@picovoice/porcupine-react";
+import keyword from "./hola-mavi/Hola-Mavi-keyword";
 import "./App.css";
 
 // Imágenes utilizadas en el estado de la aplicación
@@ -18,7 +20,8 @@ const images = {
 };
 
 // Importar el archivo .ppn
-const holaMaviKeywordPath = require("./hola-mavi/Hey-ULI_en_wasm_v3_0_0.ppn");//La frase es Hey ULI 
+const holaMaviKeywordPath = require("./hola-mavi/Hola-Mavi_es_wasm_v3_0_0.ppn"); //La frase es Hey ULI
+const holaMaviModel = require("./hola-mavi/porcupine_params_es.pv");
 
 const SpeechToTextComponent = () => {
   const [text, setText] = useState(""); // Estado para almacenar el texto reconocido
@@ -27,7 +30,17 @@ const SpeechToTextComponent = () => {
   const [wakeWordDetected, setWakeWordDetected] = useState(false); // Estado para manejar la detección de la palabra clave
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition(); // Hook para el reconocimiento de voz
-  const porcupineWorkerRef = useRef(null);
+
+  const {
+    keywordDetection,
+    isLoaded,
+    isListening,
+    error,
+    init,
+    start,
+    stop,
+    release,
+  } = usePorcupine();
 
   //Estado de conexión para SignalR
   const [connection, setConnection] = useState(null);
@@ -61,20 +74,12 @@ const SpeechToTextComponent = () => {
   useEffect(() => {
     const initPorcupine = async () => {
       try {
-        const accessKey = "YOUR_ACCESS_KEY"; // Reemplaza con tu Access Key de Picovoice
+        const accessKey = process.env.REACT_APP_PORCUPINE_KEY; // Reemplaza con tu Access Key de Picovoice
 
-        const porcupineWorker = await PorcupineWorker.create(
-          accessKey,
-          holaMaviKeywordPath,
-          (keywordIndex) => {
-            if (keywordIndex === 0) {
-              setWakeWordDetected(true);
-            }
-          }
-        );
-
-        porcupineWorkerRef.current = porcupineWorker;
-        await porcupineWorker.start();
+        await init(accessKey, [{ label: "Hola Mavi", base64: keyword }], {
+          publicPath: holaMaviModel,
+        });
+        start();
       } catch (error) {
         console.error("Error initializing Porcupine:", error);
       }
@@ -83,9 +88,7 @@ const SpeechToTextComponent = () => {
     initPorcupine();
 
     return () => {
-      if (porcupineWorkerRef.current) {
-        porcupineWorkerRef.current.terminate();
-      }
+      stop();
     };
   }, []);
 
@@ -137,7 +140,7 @@ const SpeechToTextComponent = () => {
     setText(transcript);
     resetTranscript();
 
-    if (transcript.trim()) {
+    if (transcript && transcript.trim()) {
       setStatus("Pensando");
       setImage(images.pensando);
 
@@ -178,9 +181,7 @@ const SpeechToTextComponent = () => {
           setStatus("En espera");
           setImage(images.abierto);
           // Reset to listening for wake word
-          if (porcupineWorkerRef.current) {
-            porcupineWorkerRef.current.start();
-          }
+          start();
         }, 2000); // Cambiar la imagen a "guiño" por 2 segundos cuando termina de hablar
       };
       window.speechSynthesis.speak(utterance);
