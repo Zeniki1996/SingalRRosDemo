@@ -23,6 +23,11 @@ namespace Hub.Endpoints
                 IOptionsMonitor<UrlSettings> urlSettings,
                 IOptionsMonitor<SecretSettings> secretSettings) =>
             {
+                if (string.IsNullOrWhiteSpace(request.Prompt))
+                {
+                    return Results.BadRequest("Prompt is required");
+                }
+
                 var client = httpClientFactory.CreateClient();
                 client.BaseAddress = new Uri(urlSettings.CurrentValue.AzureOpenAI);
                 client.DefaultRequestHeaders.Add("api-key", secretSettings.CurrentValue.AzureOpenAIKey);

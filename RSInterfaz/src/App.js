@@ -5,8 +5,8 @@ import SpeechRecognition, {
 import { BuiltInKeyword, PorcupineWorker } from "@picovoice/porcupine-web";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 import { usePorcupine } from "@picovoice/porcupine-react";
-import keyword from "./hola-mavi/Hola-Mavi-keyword";
 import "./App.css";
+import { MicIcon } from "lucide-react";
 
 // Imágenes utilizadas en el estado de la aplicación
 const images = {
@@ -42,6 +42,18 @@ const SpeechToTextComponent = () => {
     release,
   } = usePorcupine();
 
+  const sendCommand = async (command) => {
+    if (connection && connection.state === "Connected") {
+      try {
+        await connection.send("SendRobotCommand", command);
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      alert("No connection to server yet.");
+    }
+  };
+
   //Estado de conexión para SignalR
   const [connection, setConnection] = useState(null);
 
@@ -62,7 +74,7 @@ const SpeechToTextComponent = () => {
 
   // Establecer la conexión de SignalR
   useEffect(() => {
-    if (connection) {
+    if (connection && !connection.connectionStarted) {
       connection
         .start()
         .then(() => console.log("Connected!"))
@@ -76,10 +88,14 @@ const SpeechToTextComponent = () => {
       try {
         const accessKey = process.env.REACT_APP_PORCUPINE_KEY; // Reemplaza con tu Access Key de Picovoice
 
-        await init(accessKey, [{ label: "Hola Mavi", base64: keyword }], {
-          publicPath: holaMaviModel,
-        });
-        start();
+        await init(
+          accessKey,
+          [{ label: "Hola Mavi", base64: holaMaviKeywordPath }],
+          {
+            publicPath: holaMaviModel,
+          }
+        );
+        await start();
       } catch (error) {
         console.error("Error initializing Porcupine:", error);
       }
@@ -87,10 +103,18 @@ const SpeechToTextComponent = () => {
 
     initPorcupine();
 
-    return () => {
-      stop();
+    return async () => {
+      await stop();
+      await release();
     };
   }, []);
+
+  useEffect(() => {
+    if (keywordDetection !== null) {
+      setWakeWordDetected(true);
+      sendCommand("/OFF");
+    }
+  }, [keywordDetection]);
 
   // Efecto para manejar el cambio de imagen en base al estado
   useEffect(() => {
@@ -116,7 +140,7 @@ const SpeechToTextComponent = () => {
       handleListen();
       setWakeWordDetected(false); // Reset the wake word detected state
     }
-  }, [wakeWordDetected, handleListen]); //handlelisten añadido (si no funcciona correctamente eliminar esto)
+  }, [wakeWordDetected]); //handlelisten añadido (si no funcciona correctamente eliminar esto)
 
   const handleListen = useCallback(() => {
     if (!browserSupportsSpeechRecognition) {
@@ -125,13 +149,15 @@ const SpeechToTextComponent = () => {
     }
 
     setStatus("Escuchando");
+    resetTranscript();
     SpeechRecognition.startListening({ continuous: true, language: "es-ES" });
 
     // Handle the end event when the user stops speaking
     const recognition = SpeechRecognition.getRecognition();
     recognition.onend = () => {
       setStatus("Pensando");
-      handleStop();
+      console.log("Speech recognition ended");
+      //handleStop();
     };
   }, [browserSupportsSpeechRecognition]);
 
@@ -145,7 +171,7 @@ const SpeechToTextComponent = () => {
       setImage(images.pensando);
 
       // Enviar el texto reconocido al backend
-      fetch("http://localhost:3001/api/openai", {
+        fetch("https://hubapprs.azurewebsites.net/api/openai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -154,7 +180,8 @@ const SpeechToTextComponent = () => {
       })
         .then((response) => response.json())
         .then((data) => {
-          const responseText = data.text; // Suponiendo que el backend devuelve { text: "respuesta del bot" }
+          const responseText = data.answer;
+          console.log("Respuesta del backend:", responseText);
           setStatus("Hablando");
           handleSpeak(responseText);
         })
@@ -171,17 +198,19 @@ const SpeechToTextComponent = () => {
   };
 
   const handleSpeak = (textToSpeak) => {
-    if (textToSpeak.trim()) {
+    if (textToSpeak && textToSpeak.trim()) {
       setStatus("Hablando");
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = "es-ES"; // Establecer el idioma a español
       utterance.onend = () => {
         setImage(images.guino);
-        setTimeout(() => {
+        setTimeout(async () => {
           setStatus("En espera");
           setImage(images.abierto);
           // Reset to listening for wake word
           start();
+
+          await sendCommand("/ON");
         }, 2000); // Cambiar la imagen a "guiño" por 2 segundos cuando termina de hablar
       };
       window.speechSynthesis.speak(utterance);
@@ -203,7 +232,8 @@ const SpeechToTextComponent = () => {
           />
           <div className="button-container">
             <button onClick={handleListen}>
-              <img src="microphone-icon.png" alt="Microphone" />
+              <MicIcon size={16} />
+              <span>Speak</span>
             </button>
             <button onClick={handleStop}>Detener</button>
             <button onClick={() => handleSpeak(text)}>Hablar</button>
