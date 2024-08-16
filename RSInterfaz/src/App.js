@@ -60,7 +60,7 @@ const SpeechToTextComponent = () => {
   useEffect(() => {
     // Crear una nueva conexión de SignalR
     const newConnection = new HubConnectionBuilder()
-      .withUrl("https://hubapprs.azurewebsites.net/robot-hub")
+      .withUrl("https://robotappservice.azurewebsites.net/robot-hub")
       .withAutomaticReconnect()
       .build();
 
@@ -171,7 +171,7 @@ const SpeechToTextComponent = () => {
       setImage(images.pensando);
 
       // Enviar el texto reconocido al backend
-        fetch("https://hubapprs.azurewebsites.net/api/openai", {
+        fetch("https://robotappservice.azurewebsites.net/chat/answer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
