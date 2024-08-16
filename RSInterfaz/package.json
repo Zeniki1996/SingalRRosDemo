@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@microsoft/signalr": "^8.0.0",
     "@picovoice/porcupine-react": "^3.0.3",
     "@picovoice/porcupine-react-native": "^3.0.2",
