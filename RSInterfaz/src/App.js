@@ -85,7 +85,7 @@ const SpeechToTextComponent = () => {
         });
     } else {
       alert("No se detectó contenido de la voz");// por que en la segunda vez no responde 
-      setStatus("En espera");
+      setStatus("No detecta");
       setImage(images.abierto);
     }
   }, [transcript, resetTranscript]);
@@ -95,7 +95,6 @@ const SpeechToTextComponent = () => {
       alert("Tu navegador no soporta reconocimiento de voz");
       return;
     }
-  
     setStatus("Escuchando");
     resetTranscript();
     SpeechRecognition.startListening({ continuous: true, language: "es-ES" });
