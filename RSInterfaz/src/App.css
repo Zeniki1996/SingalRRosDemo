@@ -38,7 +38,7 @@
 }
 
 .background {
-  background-color: grey;
+  background-color: black;
   height: 100vh; /* Ajusta la altura para centrar verticalmente */
   display: flex;
   justify-content: center;
@@ -75,23 +75,27 @@ body {
 
 .pixel-art-container {
   background-color: black;
-  border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  margin: 5%;
+
 }
 
 .pixel-art {
-  margin-top: 20px;
+  margin-top: 2px;
 }
-
+.Margenimagen{
+  width: 100%;
+  height: 400px;
+  margin-bottom: 80px;
+}
 .state-image {
-  width: 60vw;
-  height: 60vh;
+  width: 100%;
+  height: 100%;
 }
 
 textarea {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 60px;
   padding: 10px;
   border-radius: 5px;
   background: black;
@@ -109,7 +113,7 @@ button {
   color: white;
   padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
   cursor: pointer;
 }
 
