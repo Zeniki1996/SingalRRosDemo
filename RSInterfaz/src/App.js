@@ -44,6 +44,12 @@ const palabrasAfirmacion = [
   "adelante",
   "ok",
 ];
+const palabrasRechazo = [
+  "no",
+  "no quiero",
+  "no lo quiero",
+  "para nada"
+];
 
 const SpeechToTextComponent = () => {
   const [sentimentStatus, setSentimentStatus] = useState("En Espera");
@@ -195,10 +201,18 @@ const SpeechToTextComponent = () => {
     setSentimentStatus("Hablando");
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = "es-ES";
+    utterance.onboundary = () =>{
+      console.log("baundary ");
+    }
+    utterance.onerror = (error) => {
+      console.error("Error al hablar ", error.error);}
     utterance.onend = () => {
+      console.log("Finalizó de hablar ");
       callback();
+
     };
     window.speechSynthesis.speak(utterance);
+
   }
 
   async function listen(callback) {
@@ -232,6 +246,8 @@ const SpeechToTextComponent = () => {
     await sendCommand("/OFF");
     await stopPorcupine();
     await listen(() => setState("Waiting Backend"));
+    setSentimentStatus("Pensando");
+
   }
 
   async function onWaitingBackend() {
@@ -274,9 +290,10 @@ const SpeechToTextComponent = () => {
 
     //si la respuesta contine palabras de afirmación
     let shouldContinue = false;
-    palabrasAfirmacion.forEach((palabra) => {
+
+    palabrasRechazo.forEach((palabra) => {
       if (toContinue.toLowerCase().includes(palabra)) {
-        shouldContinue = true;
+        shouldContinue = false;
       }
     });
 
