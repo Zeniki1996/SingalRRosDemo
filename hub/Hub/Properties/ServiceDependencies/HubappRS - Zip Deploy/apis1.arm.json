@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "Capstone",
+      "defaultValue": "DefaultResourceGroup-EUS",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "Nombre del grupo de recursos del recurso. Se recomienda poner los recursos en el mismo grupo de recursos para mejorar el seguimiento."
@@ -49,7 +49,7 @@
           "contentVersion": "1.0.0.0",
           "resources": [
             {
-              "name": "Hubapiudla",
+              "name": "Hubapi",
               "type": "Microsoft.ApiManagement/service",
               "location": "[parameters('resourceLocation')]",
               "properties": {
@@ -59,7 +59,7 @@
                 "hostnameConfigurations": [
                   {
                     "type": "Proxy",
-                    "hostName": "hubapiudla.azure-api.net",
+                    "hostName": "hubapi.azure-api.net",
                     "encodedCertificate": null,
                     "keyVaultId": null,
                     "certificatePassword": null,
@@ -95,13 +95,13 @@
             },
             {
               "type": "Microsoft.ApiManagement/service/apis",
-              "name": "Hubapiudla/Hub",
+              "name": "Hubapi/Hub",
               "properties": {
-                "displayName": "Hub",
+                "displayName": "Hub, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "apiRevision": "1",
                 "description": null,
                 "subscriptionRequired": true,
-                "serviceUrl": null,
+                "serviceUrl": "https://robotappservice.azurewebsites.net",
                 "path": "",
                 "protocols": [
                   "https"
@@ -118,7 +118,7 @@
               },
               "apiVersion": "2019-12-01",
               "dependsOn": [
-                "Hubapiudla"
+                "Hubapi"
               ]
             }
           ]
