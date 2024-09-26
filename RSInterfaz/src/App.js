@@ -50,7 +50,7 @@ const SpeechToTextComponent = () => {
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
   const { sendCommand, connectionState, on } =
-    useSignalRConnection("robot-hub");
+    useSignalRConnection("/robot-hub");
   const [answer, setAnswer] = useState("");
 
   const {

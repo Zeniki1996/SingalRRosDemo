@@ -35,7 +35,8 @@ const useSignalRConnection = (hub) => {
       try {
         console.log("Connecting to hub: ", hub);
         const newConnection = new HubConnectionBuilder()
-          .withUrl(`${process.env.REACT_APP_BACKEND_URL}/${hub}`)
+          //.withUrl(`${process.env.REACT_APP_BACKEND_URL}/${hub}`)
+          .withUrl(`${process.env.REACT_APP_BACKEND_URL}/robot-hub`)
           .withAutomaticReconnect()
           .build();
 
