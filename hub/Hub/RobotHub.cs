@@ -31,4 +31,10 @@ public sealed class RobotHub : Microsoft.AspNetCore.SignalR.Hub
         _logger.LogInformation("{@ConnectionId} send data with type {@DataType} and data {@Data}", Context.ConnectionId, dataType, data);
         await Clients.All.SendAsync("RecibirData", dataType, data);
     }
+    public async Task SendRobotStatus(string statusType, string status)
+    {
+        _logger.LogInformation("Sending {StatusType} status: {Status}", statusType, status);
+        await Clients.All.SendAsync("ReceiveStatus", statusType, status);
+    }
+
 }

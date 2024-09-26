@@ -3,6 +3,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { usePorcupine } from "@picovoice/porcupine-react";
+
 import "./App.css";
 import { MicIcon, StopCircleIcon } from "lucide-react";
 import { answerQuestion, useSignalRConnection } from "./utils/backend";
@@ -36,19 +37,10 @@ ESTADOS DE LA MAQUINA:
 *. Error
 */
 
-const palabrasAfirmacion = [
-  "sí",
-  "si",
-  "claro",
-  "por supuesto",
-  "adelante",
-  "ok",
-];
-const palabrasRechazo = [
+const palabrasNegación = [
   "no",
-  "no quiero",
-  "no lo quiero",
-  "para nada"
+  "nó",
+  "Para nada"
 ];
 
 const SpeechToTextComponent = () => {
@@ -78,7 +70,7 @@ const SpeechToTextComponent = () => {
 
       setState("Moving");
     }
-  }, [connectionState]);
+  }, [connectionState,on]);
 
   useEffect(() => {
     switch (sentimentStatus) {
@@ -86,16 +78,16 @@ const SpeechToTextComponent = () => {
         setImage(images.abierto);
         break;
       case "No detecta":
-        setImage(images.abierto);
+        setImage(images.cansado);
         break;
       case "Escuchando":
-        setImage(images.abierto);
+        setImage(images.burla);
         break;
       case "Pensando":
         setImage(images.pensando);
         break;
       case "Hablando":
-        setImage(images.cansado);
+        setImage(images.feliz);
         break;
       default:
         setImage(images.abierto);
@@ -184,16 +176,26 @@ const SpeechToTextComponent = () => {
   useEffect(() => {
     let interval;
     if (sentimentStatus === "En espera" || sentimentStatus === "No detecta") {
+      let count = 0;
+      let isOpen = true; 
       interval = setInterval(() => {
-        setImage((prevImage) =>
-          prevImage === images.abierto ? images.feliz : images.abierto
-        );
-      }, 2500);
+        if (count < 6) {  // Total de cambios (3 ciclos de abrir y feliz)
+          setImage(isOpen ? images.feliz : images.abierto);
+          isOpen = !isOpen;  // Cambia el estado de los ojos
+          count++;
+          } else {
+              clearInterval(interval);  // Limpia el intervalo después de completar la secuencia
+              setImage(images.abierto);  // Asegura que los ojos terminen abiertos
+          }
+      }, 500); 
     }
     return () => clearInterval(interval);
   }, [sentimentStatus]);
 
-  function speak(textToSpeak, callback) {
+  /*function speak(textToSpeak, callback) {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
     if (!textToSpeak || textToSpeak.trim() === "") {
       return;
     }
@@ -201,37 +203,87 @@ const SpeechToTextComponent = () => {
     setSentimentStatus("Hablando");
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = "es-ES";
-    utterance.onboundary = () =>{
-      console.log("baundary ");
-    }
-    utterance.onerror = (error) => {
-      console.error("Error al hablar ", error.error);}
-    utterance.onend = () => {
-      console.log("Finalizó de hablar ");
-      callback();
 
-    };
+       utterance.onend = () => {
+    console.log("Finalizó de hablar");
+    if (callback) callback();
+  };
+ 
+   utterance.onerror = (event) => {
+    console.error("Error al hablar: ", event.error);
+    // Manejo específico para el error 'not-allowed'
+    if (event.error === "not-allowed") {
+      setSentimentStatus("Error al Hablar");
+      console.error("La síntesis de voz no está permitida. Verifica los permisos del navegador.");
+    }
+  };
+
+  utterance.onboundary = (event) => {
+    console.log("Se ha leído la palabra en la posición:", event.charIndex);
+  };
+
     window.speechSynthesis.speak(utterance);
 
-  }
+  }*/
+    // Hook de React para manejar el estado de si está hablando
+const [isSpeaking, setIsSpeaking] = useState(false);
 
+// Función para hablar textos divididos en partes
+function speak(textToSpeak, callback) {
+  // Dividir el texto en partes manejables
+  const parts = textToSpeak.match(/[\s\S]{1,200}\.?/g) || [textToSpeak];
+  let partIndex = 0;
+
+  const speakNextPart = () => {
+    if (partIndex < parts.length) {
+        const utterance = new SpeechSynthesisUtterance(parts[partIndex]);
+        utterance.lang = "es-ES";
+
+        utterance.onend = () => {
+            partIndex++;
+            if (partIndex < parts.length) {
+                setTimeout(speakNextPart, 250);  // Pausa breve entre partes
+            } else {
+                setIsSpeaking(false);
+                if (callback) callback();
+            }
+        };
+
+        utterance.onerror = (event) => {
+          console.error("Error al hablar: ", event.error);
+          setIsSpeaking(false);
+        };
+  
+        window.speechSynthesis.speak(utterance);
+      }
+    };
+  // Solo inicia si no está ya hablando
+  if (!isSpeaking) {
+    setIsSpeaking(true);
+    speakNextPart();
+}
+}
+
+
+
+    
+//Fin prueba 
   async function listen(callback) {
     if (!browserSupportsSpeechRecognition) {
       alert("Tu navegador no soporta reconocimiento de voz");
       return;
     }
-
     setSentimentStatus("Escuchando");
-
     await SpeechRecognition.startListening({
       continuous: true,
       language: "es-ES",
     });
+  
     setTimeout(() => {
       SpeechRecognition.stopListening().then(() => {
         callback();
       });
-    }, 6000); //6 seconds timeout to stop listening;
+    }, 5000); //5 seconds timeout to stop listening;
   }
 
   async function onMoving() {
@@ -246,17 +298,21 @@ const SpeechToTextComponent = () => {
     await sendCommand("/OFF");
     await stopPorcupine();
     await listen(() => setState("Waiting Backend"));
-    setSentimentStatus("Pensando");
+    setSentimentStatus("Escuchando");
+    setImage(images.cansado);
 
   }
 
   async function onWaitingBackend() {
     console.log("Waiting Backend");
+    setSentimentStatus("Conectando a la base de conocimiento ");
+    setImage(images.pensando);
     var question = transcript.trim();
     resetTranscript();
 
     if (question === "") {
       setState("Goodbye");
+      setImage(images.guino);
       return;
     }
 
@@ -264,17 +320,24 @@ const SpeechToTextComponent = () => {
 
     if (error || answer === "") {
       console.error("Error al llamar a la API:", error);
-      setSentimentStatus("En espera");
+      setSentimentStatus("Error");
+      setImage(images.cansado);
     }
 
     console.log("Respuesta del backend:", answer);
     setAnswer(answer);
     setState("Speaking");
+    setImage(images.triste);
   }
 
   async function onSpeaking() {
     console.log("Speaking");
-    speak(answer, () => setState("ExpectIfContinue"));
+    speak(answer, () => {
+      console.log("Finished speaking");
+      setImage(images.guino);
+      setState("ExpectIfContinue");
+  });
+    //speak(answer, () => setState("ExpectIfContinue"));
   }
 
   async function onExpectIfContinue() {
@@ -289,19 +352,27 @@ const SpeechToTextComponent = () => {
     console.log("Continuar? ", toContinue);
 
     //si la respuesta contine palabras de afirmación
-    let shouldContinue = false;
-
-    palabrasRechazo.forEach((palabra) => {
+    let shouldContinue = true;
+    palabrasNegación.forEach((palabra) => {
       if (toContinue.toLowerCase().includes(palabra)) {
         shouldContinue = false;
       }
     });
 
-    if (shouldContinue) {
-      setState("Listening");
-    } else {
+    if (toContinue === "" || !shouldContinue){
       setState("Goodbye");
+      return ;
     }
+    const [error, answer] = await answerQuestion(toContinue);
+
+    if (error || answer === "") {
+      console.error("Error al llamar a la API:", error);
+      setSentimentStatus("En espera");
+    }
+
+    console.log("Respuesta del backend:", answer);
+    setAnswer(answer);
+    setState("Speaking");
   }
 
   async function onGoodbye() {

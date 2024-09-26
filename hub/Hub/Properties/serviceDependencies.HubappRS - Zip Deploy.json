@@ -12,6 +12,10 @@
       "apiEndpoint": "https://hubapi.azure-api.net/",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/Hubapi/apis/Hub",
       "type": "apis.azure"
+    },
+    "secrets1": {
+      "ignored": "true",
+      "type": "secrets"
     }
   }
 }

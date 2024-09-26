@@ -15,13 +15,14 @@ async function answerQuestion(question) {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to answer question");
-    }
+      throw new Error(`Failed to answer question: ${response.status} ${response.statusText}`);
+        }
 
     const data = await response.json();
     return [null, data.answer];
   } catch (e) {
-    return [e, null];
+      console.error("Error fetching answer:", e.message);
+      return [e.message, null];
   }
 }
 
@@ -38,9 +39,18 @@ const useSignalRConnection = (hub) => {
           .withAutomaticReconnect()
           .build();
 
-        newConnection.onclose(() => setConnectionState("Disconnected"));
-        newConnection.onreconnecting(() => setConnectionState("Reconnecting"));
-        newConnection.onreconnected(() => setConnectionState("Connected"));
+          newConnection.onclose(() => {
+            console.log("Connection closed");
+            setConnectionState("Disconnected");
+        });
+        newConnection.onreconnecting(() => {
+            console.log("Reconnecting...");
+            setConnectionState("Reconnecting");
+        });
+        newConnection.onreconnected(() => {
+            console.log("Reconnected");
+            setConnectionState("Connected");
+        });
 
         await newConnection.start();
         setConnection(newConnection);
@@ -55,32 +65,29 @@ const useSignalRConnection = (hub) => {
     }
     return () => {
       if (connection) {
-        connection.stop();
+        connection?.stop();
         setConnection(null);
       }
     };
   }, [hub, connection]);
 
-  async function sendCommand(command) {
+  
+
+  const sendCommand = useCallback(async (command) => {
     if (connection && connectionState === "Connected") {
       try {
-        await connection.send("SendRobotCommand", command);
+          await connection.send("SendRobotCommand", command);
       } catch (error) {
-        console.error("Error sending command: ", error);
+          console.error("Error sending command: ", error);
       }
-    } else {
+  } else {
       console.error("No connection to server yet.");
-    }
   }
+}, [connection, connectionState]);
 
-  const on = useCallback(
-    (event, callback) => {
-      if (connection) {
-        connection.on(event, callback);
-      }
-    },
-    [connection]
-  );
+const on = useCallback((event, callback) => {
+  connection?.on(event, callback);
+}, [connection]);
 
   return { connection, connectionState, sendCommand, on };
 };
