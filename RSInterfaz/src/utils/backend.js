@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+/*import { useState, useEffect, useCallback } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 
 async function answerQuestion(question) {
@@ -93,4 +93,4 @@ const on = useCallback((event, callback) => {
   return { connection, connectionState, sendCommand, on };
 };
 
-export { answerQuestion, useSignalRConnection };
+export { answerQuestion, useSignalRConnection };*/
