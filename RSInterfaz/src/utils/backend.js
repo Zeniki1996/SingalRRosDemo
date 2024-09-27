@@ -1,10 +1,10 @@
-/*import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 
 async function answerQuestion(question) {
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/chat/answer`,
+      `https://robotappservice.azurewebsites.net/chat/answer`,
       {
         method: "POST",
         headers: {
@@ -36,7 +36,7 @@ const useSignalRConnection = (hub) => {
         console.log("Connecting to hub: ", hub);
         const newConnection = new HubConnectionBuilder()
           //.withUrl(`${process.env.REACT_APP_BACKEND_URL}/${hub}`)
-          .withUrl(`${process.env.REACT_APP_BACKEND_URL}/robot-hub`)
+          .withUrl(`https://robotappservice.azurewebsites.net/robot-hub`)
           .withAutomaticReconnect()
           .build();
 
@@ -93,4 +93,4 @@ const on = useCallback((event, callback) => {
   return { connection, connectionState, sendCommand, on };
 };
 
-export { answerQuestion, useSignalRConnection };*/
+export { answerQuestion, useSignalRConnection };
