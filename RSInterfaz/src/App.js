@@ -59,7 +59,12 @@ const SpeechToTextComponent = () => {
     start: startPorcupine,
     stop: stopPorcupine,
     release: releasePorcupine,
+    error: errorporcupine,
   } = usePorcupine();
+
+  useEffect(() => {
+   console.log("Error: ",errorporcupine);
+  }, [errorporcupine]);
 
   useEffect(() => {
     if (connectionState === "Connected") {
