@@ -123,7 +123,7 @@ const SpeechToTextComponent = () => {
     return () => {
       releasePorcupine();
     };
-  }, [initPorcupine, startPorcupine, stopPorcupine, releasePorcupine]);
+  }, []);
 
   useEffect(() => {
     const checkState = async () => {
