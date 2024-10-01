@@ -313,6 +313,7 @@ function speak(textToSpeak, callback) {
     setSentimentStatus("Conectando a la base de conocimiento ");
     setImage(images.pensando);
     var question = transcript.trim();
+    console.log("pregunta: ", question);
     resetTranscript();
 
     if (question === "") {
