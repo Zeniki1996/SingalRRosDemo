@@ -103,7 +103,7 @@ const SpeechToTextComponent = () => {
   useEffect(() => {
     const initPorcupineListening = async () => {
       try {
-        const accessKey = '37cwK8CGjPCDR4tQRIJXyFE/GX2m9h8NsRPMCIbnXMT2hMMrx51LGg==';
+        const accessKey = 'VWT3TYOOFPWEXfhrMMXYZkqp3+hV9As1S1D5r2zGnDyjyHD2aHu+/g==';
 
         await initPorcupine(
           accessKey,
