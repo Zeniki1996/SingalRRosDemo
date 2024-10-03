@@ -33,14 +33,17 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
+// Redirige a HTTPS
 app.UseHttpsRedirection();
 
 app.UseCors("Policy");
-
+// Mapeo de endpoints, controladores y el Hub de SignalR
 app.MapControllers();
 app.MapChatEndpoint();
 
 app.MapHub<RobotHub>("/robot-hub");
 
 await app.RunAsync();
+
+
+
