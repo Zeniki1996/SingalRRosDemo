@@ -92,7 +92,7 @@ const SpeechToTextComponent = () => {
         timeSequence = [5200, 10000];
         break;
       case "Escuchando":
-        imageSequence = [images.burla, images.abierto, images.feliz, image.abierto];
+        imageSequence = [images.burla, images.abierto, images.feliz, images.abierto];
         timeSequence = [2000, 4000, 1000, 3000];
         break;
       case "Pensando":
@@ -314,8 +314,7 @@ function speak(textToSpeak, callback) {
 
 
 
-    
-//Fin prueba 
+
   async function listen(callback) {
     if (!browserSupportsSpeechRecognition) {
       alert("Tu navegador no soporta reconocimiento de voz");
