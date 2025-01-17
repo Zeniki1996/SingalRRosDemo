@@ -140,6 +140,9 @@ const SpeechToTextComponent = () => {
     const initPorcupineListening = async () => {
       try {
         const accessKey = 'VWT3TYOOFPWEXfhrMMXYZkqp3+hV9As1S1D5r2zGnDyjyHD2aHu+/g==';
+        console.log("Variable de entorno viendo si funca",process.env);
+        console.log("BACKEND_URL:", process.env.REACT_APP_BACKEND_URL);
+        console.log("OPENAI_API_KEY:", process.env.REACT_APP_OPENAI_API_KEY);
 
         await initPorcupine(
           accessKey,
