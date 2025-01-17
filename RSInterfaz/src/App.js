@@ -11,7 +11,6 @@ import { answerQuestion, useSignalRConnection } from "./utils/backend";
 // Importar los archivos .ppn y .pv usando rutas relativas
 import holaMaviKeywordPath from "./mavi/Hola-Mavi_es_wasm_v3_0_0.ppn";
 import holaMaviModel from "./mavi/porcupine_params_es.pv";
-import { OpenAI } from "openai";
 
 // Imágenes utilizadas en el estado de la aplicación
 const images = {
@@ -63,35 +62,6 @@ const SpeechToTextComponent = () => {
     release: releasePorcupine,
     error: errorporcupine,
   } = usePorcupine();
-  
-
-//Conexion chatGPT
-console.log("Variable de entorno viendo si funca",process.env);
-console.log("BACKEND_URL:", process.env.REACT_APP_BACKEND_URL);
-console.log("OPENAI_API_KEY:", process.env.REACT_APP_OPENAI_API_KEY);
-const openai = new OpenAI({
-  apiKey: process.env.REACT_APP_OPENAI_API_KEY, // Asegúrate de tener la clave configurada prueba
-  //prueba
-  dangerouslyAllowBrowser: true,
-});
-
-async function answerQuestion(question) {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        { role: "system", content: "Eres un asistente amable y servicial." },
-        { role: "user", content: question },
-      ],
-    });
-
-    const answer = response.choices[0]?.message?.content || "Lo siento, no tengo una respuesta.";
-    return [null, answer];
-  } catch (e) {
-    console.error("Error fetching answer:", e.message);
-    return [e.message, null];
-  }
-}
 
   useEffect(() => {
    console.log("Error: ",errorporcupine);
@@ -170,9 +140,6 @@ async function answerQuestion(question) {
     const initPorcupineListening = async () => {
       try {
         const accessKey = 'VWT3TYOOFPWEXfhrMMXYZkqp3+hV9As1S1D5r2zGnDyjyHD2aHu+/g==';
-        console.log("Variable de entorno viendo si funca",process.env);
-        console.log("BACKEND_URL:", process.env.REACT_APP_BACKEND_URL);
-        console.log("OPENAI_API_KEY:", process.env.REACT_APP_OPENAI_API_KEY);
 
         await initPorcupine(
           accessKey,
@@ -193,8 +160,6 @@ async function answerQuestion(question) {
       releasePorcupine();
     };
   }, []);
-
-
 
   useEffect(() => {
     const checkState = async () => {

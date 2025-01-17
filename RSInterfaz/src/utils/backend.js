@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
-/*import { OpenAI } from "openai";
+import { OpenAI } from "openai";
 
 //Conexion chatGPT
 console.log("Variable de entorno viendo si funca",process.env);
@@ -8,7 +8,6 @@ console.log("BACKEND_URL:", process.env.REACT_APP_BACKEND_URL);
 console.log("OPENAI_API_KEY:", process.env.REACT_APP_OPENAI_API_KEY);
 const openai = new OpenAI({
   apiKey: process.env.REACT_APP_OPENAI_API_KEY, // Asegúrate de tener la clave configurada prueba
-  //prueba
   dangerouslyAllowBrowser: true,
 });
 
@@ -28,7 +27,7 @@ async function answerQuestion(question) {
     console.error("Error fetching answer:", e.message);
     return [e.message, null];
   }
-}*/
+}
 /* Códico conexión azure 
 async function answerQuestion(question) {
   try {
@@ -122,4 +121,4 @@ const on = useCallback((event, callback) => {
   return { connection, connectionState, sendCommand, on };
 };
 
-export { useSignalRConnection };
+export { answerQuestion, useSignalRConnection };
