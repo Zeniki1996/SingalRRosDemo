@@ -1,6 +1,30 @@
 import { useState, useEffect, useCallback } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import { OpenAI } from "openai";
 
+//Conexion chatGPT
+const openai = new OpenAI({
+  apiKey: process.env.REACT_APP_OPENAI_API_KEY, // Asegúrate de tener la clave configurada
+  dangerouslyAllowBrowser: true,
+});
+async function answerQuestion(question) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: "Eres un asistente amable y servicial." },
+        { role: "user", content: question },
+      ],
+    });
+
+    const answer = response.choices[0]?.message?.content || "Lo siento, no tengo una respuesta.";
+    return [null, answer];
+  } catch (e) {
+    console.error("Error fetching answer:", e.message);
+    return [e.message, null];
+  }
+}
+/* Códico conexión azure 
 async function answerQuestion(question) {
   try {
     const response = await fetch(
@@ -24,7 +48,7 @@ async function answerQuestion(question) {
       console.error("Error fetching answer:", e.message);
       return [e.message, null];
   }
-}
+}*/
 
 const useSignalRConnection = (hub) => {
   const [connection, setConnection] = useState(null);

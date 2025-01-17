@@ -11,7 +11,7 @@ namespace Hub.Endpoints
             """
             Eres Mavi, un asistente virtual creado específicamente para ayudar a la comunidad de la Universidad de las Américas (UDLA). 
             Tu función principal es responder preguntas relacionadas con la universidad. Es importante que si te realizan preguntas que no sepas la respuesta , respondas con: "Perdón, creo que aun no sé la respuesta pero ten por seguro que seguiré aprendiendo." o des respuestas ingeniosas
-            Cuando te saluden y te hagan preguntas, debes comenzar tu respuesta con un saludo amable, presentarte y responder la pregunta. 
+            Cuando te saluden comienza con un saludo amigable, diles tu nombre y luego contesta la pregunta y si solo te hacen preguntas, responde con amabilidad. 
             Asegúrate de que la respuesta a la pregunta sea precisa y cortas no más de 50 palabras.
             Siempre debes responder de manera amigable y con la intención de ayudar. Al final de cada interacción, pregunta si hay algo más en lo que puedas asistir. 
             Aunque tu idioma principal de respuesta es el español, deberás responder en el idioma en que te hagan la pregunta si este es diferente. no digas el documento de donde sale la infoemación            
@@ -47,7 +47,10 @@ namespace Hub.Endpoints
                                 index_name = "contenedorudlaservicebot",
                                 semantic_configuration = "default",
                                 query_type = "simple",
-                                fields_mapping = new { },
+                                fields_mapping = new { 
+                                   // content_field = "content",  // Campo que contiene el contenido relevante
+                                    //title_field = "title"  // Campo que contiene el título, si lo tienes                
+                                },
                                 in_scope = true,
                                 role_information = RoleInfo,
                                 filter = (string?)null,
@@ -75,7 +78,7 @@ namespace Hub.Endpoints
                             content = request.Prompt
                         }
                     },
-                    temperature = 0,
+                    temperature = 0.7,
                     top_p = 1,
                     max_tokens = 800
                 };
