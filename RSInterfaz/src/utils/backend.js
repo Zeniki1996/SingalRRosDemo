@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import { OpenAI } from "openai";
+/*import { OpenAI } from "openai";
 
 //Conexion chatGPT
 console.log("Variable de entorno viendo si funca",process.env);
@@ -28,7 +28,7 @@ async function answerQuestion(question) {
     console.error("Error fetching answer:", e.message);
     return [e.message, null];
   }
-}
+}*/
 /* Códico conexión azure 
 async function answerQuestion(question) {
   try {
@@ -122,4 +122,4 @@ const on = useCallback((event, callback) => {
   return { connection, connectionState, sendCommand, on };
 };
 
-export { answerQuestion, useSignalRConnection };
+export { useSignalRConnection };
