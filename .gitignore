@@ -1,5 +1,2 @@
 RSInterfaz/my-backend/node_modules
 *.vs
-# Ignorar archivo de variables de entorno
-.env
-
