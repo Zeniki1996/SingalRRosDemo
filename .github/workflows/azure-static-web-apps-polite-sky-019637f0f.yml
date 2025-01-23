@@ -19,6 +19,8 @@ jobs:
         with:
           submodules: true
           lfs: false
+          #path to binaries
+          app_location: "./RSInterfaz"
       - name: Create .env.production file
         run: |
           echo "REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}" >> .env.production
