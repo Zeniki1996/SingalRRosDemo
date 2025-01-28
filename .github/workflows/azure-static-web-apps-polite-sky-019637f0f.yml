@@ -20,12 +20,7 @@ jobs:
           submodules: true
           lfs: false
           #path to binaries
-          app_location: "./RSInterfaz"
-      - name: Create .env.production file
-        run: |
-          echo "REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}" >> .env.production
-          echo "REACT_APP_PORCUPINE_KEY=${{ secrets.REACT_APP_PORCUPINE_KEY }}" >> .env.production
-          echo "REACT_APP_OPENAI_API_KEY=${{ secrets.REACT_APP_OPENAI_API_KEY }}" >> .env.production
+          app_location: "./RSInterfaz"      
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
