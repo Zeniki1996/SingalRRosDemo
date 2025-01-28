@@ -34,7 +34,6 @@ jobs:
           echo "BACKEND_URL=$REACT_APP_BACKEND_URL"
           echo "OPENAI_API_KEY=$REACT_APP_OPENAI_API_KEY"
           echo "PORCUPINE_KEY=$REACT_APP_PORCUPINE_KEY"
-          # Nota: No hagas echo de secretos reales en un entorno público.
 
       # Install dependencies and build the app
       - name: Install Dependencies
