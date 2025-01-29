@@ -3,11 +3,9 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { usePorcupine } from "@picovoice/porcupine-react";
-
-import "./App.css";
 import { MicIcon, StopCircleIcon } from "lucide-react";
 import { answerQuestion, useSignalRConnection } from "./utils/backend";
-
+import "./App.css";
 // Importar los archivos .ppn y .pv usando rutas relativas
 import holaMaviKeywordPath from "./mavi/Hola-Mavi_es_wasm_v3_0_0.ppn";
 import holaMaviModel from "./mavi/porcupine_params_es.pv";
@@ -47,6 +45,7 @@ const SpeechToTextComponent = () => {
   const [sentimentStatus, setSentimentStatus] = useState("En espera de pregunta");
   const [state, setState] = useState("Loading");
   const [image, setImage] = useState(images.abierto);
+  const [showStart, setShowStart] = useState(true); // Estado para la ventana emergente
   const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
   const { sendCommand, connectionState, on } =
@@ -200,7 +199,6 @@ const SpeechToTextComponent = () => {
 
         case "Goodbye":
           onGoodbye();
-          setSentimentStatus("Fin");
           break;
 
         case "Error":
@@ -331,6 +329,11 @@ function speak(textToSpeak, callback) {
       });
     }, 5000); //5 seconds timeout to stop listening;
   }
+// Función para manejar el botón de inicio
+const handleStart = () => {
+  setShowStart(false); // Oculta la ventana de inicio
+  setState("Moving");  // Inicia el bot
+};
 
   async function onMoving() {
     console.log("Moving");
@@ -426,29 +429,45 @@ function speak(textToSpeak, callback) {
   if (state === "Loading") {
     return <div className="centered">Cargando...</div>;
   }
-
+ 
   return (
-    <div className="centered">
-      <div className="pixel-art-container">
-        <div className="Margenimagen">
-          <img src={image} alt="Estado actual" className="state-image" />
-        </div>
-        <div className="pixel-art">
-          <textarea rows="2" cols="50" value={answer} readOnly />
-          <div className="button-container">
-            <button onClick={() => setState("Listening")}>
-              <MicIcon size={30} />
-            </button>
-            <button onClick={() => window.speechSynthesis.cancel()}>
-              <StopCircleIcon size={30} />
+    <div className="background">
+      {showStart ? (
+        // Pantalla de inicio con botón START
+        <div className="start-overlay">
+          <div className="start-container">
+            
+            <button onClick={handleStart} className="start-button">
+              START
             </button>
           </div>
         </div>
-      </div>
-      <span style={{ color: "white" }}>{sentimentStatus}</span>
+      ) : (
+        // UI del bot (se muestra solo después de presionar START)
+        <div className="centered">
+          <div className="pixel-art-container">
+            <div className="Margenimagen">
+              <img src={image} alt="Estado actual" className="state-image" />
+            </div>
+            <div className="pixel-art">
+              <textarea rows="2" cols="50" value={answer} readOnly />
+              <div className="button-container">
+                <button onClick={() => setState("Listening")}>
+                  <MicIcon size={30} />
+                </button>
+                <button onClick={() => setState("Moving")} >
+                  <StopCircleIcon size={30} />
+                </button>
+              </div>
+            </div>
+          </div>
+          <span style={{ color: "white" }}>{sentimentStatus}</span>
+        </div>
+      )}
     </div>
   );
 };
+
 
 const App = () => {
   return (
